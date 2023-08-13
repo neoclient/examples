@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "httpbin"
+version = "0.1.0"
+description = "HTTPBin Client"
+authors = ["Tom Bulled <26026015+tombulled@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+neoclient = "^0.1.41"
+pydantic = "^1.10.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+allow_empty_bodies = true

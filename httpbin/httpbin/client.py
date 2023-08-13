@@ -1,6 +1,7 @@
-from typing import Mapping, Optional
+from typing import Mapping, Optional, Sequence
 import neoclient
-from neoclient import Header
+from neoclient import Header, Path
+from neoclient.dependencies import status_code
 
 from .dependencies import origin, headers, user_agent
 from .models import GetResponse, FullResponse
@@ -21,7 +22,7 @@ class HttpBin(neoclient.Service):
         ...
 
     @neoclient.get("/get")
-    def get(self) -> GetResponse:
+    def get(self, **params: str) -> GetResponse:
         ...
 
     @neoclient.patch("/patch")
@@ -47,12 +48,30 @@ class HttpBin(neoclient.Service):
 
     # <Status codes>: Generate responses with given status code
 
-    # TODO: `Paths` doesn't currently support a custom delimiter
-    # @neoclient.delete("/status/{codes}")
-    # def delete_status(self, *codes: str):
-    #     ...
+    @neoclient.delete("/status/{codes}", response=status_code)
+    def status_delete(self, codes: Sequence[str] = Path(delimiter=",")) -> int:
+        """Return status code or random status code if more than one are given"""
+        ...
 
-    # TODO: Implement remaining status code operations
+    @neoclient.get("/status/{codes}", response=status_code)
+    def status_get(self, codes: Sequence[str] = Path(delimiter=",")) -> int:
+        """Return status code or random status code if more than one are given"""
+        ...
+
+    @neoclient.patch("/status/{codes}", response=status_code)
+    def status_patch(self, codes: Sequence[str] = Path(delimiter=",")) -> int:
+        """Return status code or random status code if more than one are given"""
+        ...
+
+    @neoclient.post("/status/{codes}", response=status_code)
+    def status_post(self, codes: Sequence[str] = Path(delimiter=",")) -> int:
+        """Return status code or random status code if more than one are given"""
+        ...
+
+    @neoclient.put("/status/{codes}", response=status_code)
+    def status_put(self, codes: Sequence[str] = Path(delimiter=",")) -> int:
+        """Return status code or random status code if more than one are given"""
+        ...
 
     # </Status codes>
 

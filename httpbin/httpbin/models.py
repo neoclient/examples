@@ -14,7 +14,7 @@ class FullResponse(BaseModel):
     url: str
 
 
-class GetResponse(BaseModel):
+class PartialResponse(BaseModel):
     args: Mapping[str, str]
     headers: Mapping[str, str]
     origin: str
@@ -33,3 +33,8 @@ class HeadersResponse:
 
 class UserAgentResponse(BaseModel):
     user_agent: str = Field(alias="user-agent")
+
+
+@dataclass
+class CookiesResponse:
+    cookies: Mapping[str, str]

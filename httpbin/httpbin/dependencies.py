@@ -1,5 +1,5 @@
 from typing import Mapping
-from .models import HeadersResponse, IpResponse, UserAgentResponse
+from .models import CookiesResponse, HeadersResponse, IpResponse, UserAgentResponse
 
 
 def origin(response: IpResponse, /) -> str:
@@ -12,3 +12,7 @@ def headers(response: HeadersResponse, /) -> Mapping[str, str]:
 
 def user_agent(response: UserAgentResponse, /) -> str:
     return response.user_agent
+
+
+def cookies(response: CookiesResponse, /) -> Mapping[str, str]:
+    return response.cookies

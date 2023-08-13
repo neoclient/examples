@@ -1,10 +1,11 @@
 from typing import Mapping, Optional, Sequence
+
 import neoclient
-from neoclient import Header, Path
+from neoclient import Header, Path, follow_redirects
 from neoclient.dependencies import status_code
 
-from .dependencies import origin, headers, user_agent
-from .models import GetResponse, FullResponse
+from .dependencies import cookies, headers, origin, user_agent
+from .models import FullResponse, PartialResponse
 
 # def log_request(call_next, request):
 #     print("Sending Request:", request.__dict__)
@@ -22,7 +23,7 @@ class HttpBin(neoclient.Service):
         ...
 
     @neoclient.get("/get")
-    def get(self, **params: str) -> GetResponse:
+    def get(self, **params: str) -> PartialResponse:
         ...
 
     @neoclient.patch("/patch")
@@ -37,7 +38,7 @@ class HttpBin(neoclient.Service):
 
     # <Auth>: Auth methods
 
-    # TODO: `neoclient` does not yet support HTTP Basic Auth
+    # TODO: `neoclient` does not yet support HTTP Basic Auth (#41)
     # @neoclient.get("/basic-auth/{user}/{passwd}")
     # def basic_auth(self, user: str, passwd: str):
     #     ...
@@ -108,7 +109,7 @@ class HttpBin(neoclient.Service):
     #     ...
 
     @neoclient.get("/cache/{value}")
-    def cache_set(self, value: int, /) -> GetResponse:
+    def cache_set(self, value: int, /) -> PartialResponse:
         """Sets a Cache-Control header for n seconds."""
         ...
 
@@ -124,12 +125,13 @@ class HttpBin(neoclient.Service):
     # ) -> Optional[GetResponse]:
     #     ...
 
-    # TODO: Pass in query params (#146)
-    # @neoclient.get("/response-headers")
-    # def response_headers_get(self) -> Mapping[str, str]:
-    #     ...
+    @neoclient.get("/response-headers")
+    def response_headers_get(self, **params: str) -> Mapping[str, str]:
+        ...
 
-    # TODO: Implement POST /response-headers
+    @neoclient.post("/response-headers")
+    def response_headers_post(self, **params: str) -> Mapping[str, str]:
+        ...
 
     # </Response inspection>
 
@@ -142,7 +144,24 @@ class HttpBin(neoclient.Service):
     # </Dynamic data>
 
     # <Cookies>: Creates, reads and deletes Cookies
-    # TODO
+    
+    @neoclient.get("/cookies", response=cookies)
+    def cookies_list(self) -> Mapping[str, str]:
+        """Returns cookie data."""
+        ...
+
+    @follow_redirects(True)
+    @neoclient.get("/cookies/delete", response=cookies)
+    def cookies_delete(self, *cookies: str) -> Mapping[str, str]:
+        """Deletes cookie(s) as provided by the query string and redirects to cookie list."""
+        ...
+    
+    @follow_redirects(True)
+    @neoclient.get("/cookies/set", response=cookies)
+    def cookies_set(self, **cookies: str) -> Mapping[str, str]:
+        """Sets cookie(s) as provided by the query string and redirects to cookie list."""
+        ...
+
     # </Cookies>
 
     # <Images>: Returns different image formats

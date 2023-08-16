@@ -1,11 +1,13 @@
 from typing import Mapping, Optional, Sequence
 
 import neoclient
-from neoclient import Header, Path, follow_redirects
+from neoclient import Header, Path, follow_redirects, Response, middleware, State
+from neoclient.decorators import request_depends
 from neoclient.dependencies import status_code
 
-from .dependencies import cookies, headers, origin, user_agent
+from .dependencies import cookies, headers, origin, state_to_path_params, user_agent
 from .models import FullResponse, PartialResponse
+from .middleware import basic_auth
 
 # def log_request(call_next, request):
 #     print("Sending Request:", request.__dict__)
@@ -38,9 +40,11 @@ class HttpBin(neoclient.Service):
 
     # <Auth>: Auth methods
 
-    # TODO: `neoclient` does not yet support HTTP Basic Auth (#41)
+    # TODO: Currently blocked/related by/to: #158, #161, #162
+    # @request_depends(state_to_path_params)
+    # @middleware(basic_auth)
     # @neoclient.get("/basic-auth/{user}/{passwd}")
-    # def basic_auth(self, user: str, passwd: str):
+    # def basic_auth(self, user: str = State(), passwd: str = State()) -> Response:
     #     ...
 
     # TODO: Implement remaining auth operations
@@ -144,7 +148,7 @@ class HttpBin(neoclient.Service):
     # </Dynamic data>
 
     # <Cookies>: Creates, reads and deletes Cookies
-    
+
     @neoclient.get("/cookies", response=cookies)
     def cookies_list(self) -> Mapping[str, str]:
         """Returns cookie data."""
@@ -155,7 +159,7 @@ class HttpBin(neoclient.Service):
     def cookies_delete(self, *cookies: str) -> Mapping[str, str]:
         """Deletes cookie(s) as provided by the query string and redirects to cookie list."""
         ...
-    
+
     @follow_redirects(True)
     @neoclient.get("/cookies/set", response=cookies)
     def cookies_set(self, **cookies: str) -> Mapping[str, str]:

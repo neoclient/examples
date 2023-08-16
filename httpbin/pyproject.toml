@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-neoclient = "^0.1.45"
+neoclient = "^0.1.49"
 pydantic = "^1.10.0"
 
 [build-system]

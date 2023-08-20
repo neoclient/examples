@@ -1,7 +1,16 @@
 from typing import Mapping, Optional, Sequence
 
 import neoclient
-from neoclient import Header, Path, follow_redirects, Response, middleware, State
+from neoclient import (
+    Header,
+    Path,
+    follow_redirects,
+    Response,
+    middleware,
+    State,
+    QueryParams,
+    Headers,
+)
 from neoclient.decorators import request_depends, raise_for_status
 from neoclient.dependencies import status_code, location
 
@@ -173,11 +182,16 @@ class HttpBin(neoclient.Service):
     # </Images>
 
     # <Redirects>: Returns different redirect responses
-    
+
     @follow_redirects(True)
     @neoclient.get("/absolute-redirect/{n}")
     def absolute_redirect(self, n: int, /) -> PartialResponse:
         """Absolutely 302 Redirects n times."""
+        ...
+
+    @neoclient.delete("/redirect-to", response=location)
+    def redirect_to_delete(self, url: str) -> str:
+        """302/3XX Redirects to the given URL."""
         ...
 
     @neoclient.get("/redirect-to", response=location)
@@ -185,8 +199,45 @@ class HttpBin(neoclient.Service):
         """302/3XX Redirects to the given URL."""
         ...
 
+    @neoclient.patch("/redirect-to", response=location)
+    def redirect_to_patch(self, url: str) -> str:
+        """302/3XX Redirects to the given URL."""
+        ...
+
+    @neoclient.post("/redirect-to", response=location)
+    def redirect_to_post(self, url: str) -> str:
+        """302/3XX Redirects to the given URL."""
+        ...
+
+    @neoclient.put("/redirect-to", response=location)
+    def redirect_to_put(self, url: str) -> str:
+        """302/3XX Redirects to the given URL."""
+        ...
+
+    @follow_redirects(True)
+    @neoclient.get("/redirect/{n}")
+    def redirect(self, n: int, /) -> PartialResponse:
+        """302 Redirects n times."""
+        ...
+
+    @follow_redirects(True)
+    @neoclient.get("/relative-redirect/{n}")
+    def relative_redirect(self, n: int, /) -> PartialResponse:
+        """302 Redirects n times."""
+        ...
+
     # </Redirects>
 
     # <Anything>: Returns anything that is passed to request
-    # TODO
+
+    # @neoclient.delete("/anything")
+    # def anything_delete(
+    #     self,
+    #     *,
+    #     params: Mapping[str, str] = QueryParams(default_factory=dict),
+    #     headers: Mapping[str, str] = Headers(default_factory=dict),
+    # ) -> FullResponse:
+    #     """Returns anything passed in request data."""
+    #     ...
+
     # </Anything>

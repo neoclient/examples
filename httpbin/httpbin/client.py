@@ -2,11 +2,11 @@ from typing import Mapping, Optional, Sequence
 
 import neoclient
 from neoclient import Header, Path, follow_redirects, Response, middleware, State
-from neoclient.decorators import request_depends
-from neoclient.dependencies import status_code
+from neoclient.decorators import request_depends, raise_for_status
+from neoclient.dependencies import status_code, location
 
 from .dependencies import cookies, headers, origin, state_to_path_params, user_agent
-from .models import FullResponse, PartialResponse
+from .models import AuthResponse, FullResponse, PartialResponse
 from .middleware import basic_auth
 
 # def log_request(call_next, request):
@@ -16,7 +16,8 @@ from .middleware import basic_auth
 
 
 # @neoclient.middleware(log_request)
-@neoclient.base_url("https://httpbin.org/")
+# @neoclient.base_url("https://httpbin.org/")
+@neoclient.base_url("http://127.0.0.1:8080/")
 class HttpBin(neoclient.Service):
     # <HTTP Methods>: Testing different HTTP verbs
 
@@ -40,12 +41,11 @@ class HttpBin(neoclient.Service):
 
     # <Auth>: Auth methods
 
-    # TODO: Currently blocked/related by/to: #158, #161, #162
-    # @request_depends(state_to_path_params)
-    # @middleware(basic_auth)
-    # @neoclient.get("/basic-auth/{user}/{passwd}")
-    # def basic_auth(self, user: str = State(), passwd: str = State()) -> Response:
-    #     ...
+    @request_depends(state_to_path_params)
+    @middleware(basic_auth)
+    @neoclient.get("/basic-auth/{user}/{passwd}")
+    def basic_auth(self, user: str = State(), passwd: str = State()) -> AuthResponse:
+        ...
 
     # TODO: Implement remaining auth operations
 
@@ -173,7 +173,18 @@ class HttpBin(neoclient.Service):
     # </Images>
 
     # <Redirects>: Returns different redirect responses
-    # TODO
+    
+    @follow_redirects(True)
+    @neoclient.get("/absolute-redirect/{n}")
+    def absolute_redirect(self, n: int, /) -> PartialResponse:
+        """Absolutely 302 Redirects n times."""
+        ...
+
+    @neoclient.get("/redirect-to", response=location)
+    def redirect_to_get(self, url: str) -> str:
+        """302/3XX Redirects to the given URL."""
+        ...
+
     # </Redirects>
 
     # <Anything>: Returns anything that is passed to request

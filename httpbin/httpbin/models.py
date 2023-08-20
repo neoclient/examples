@@ -38,3 +38,9 @@ class UserAgentResponse(BaseModel):
 @dataclass
 class CookiesResponse:
     cookies: Mapping[str, str]
+
+
+@dataclass
+class AuthResponse:
+    authenticated: bool
+    user: str
